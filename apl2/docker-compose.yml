@@ -1,0 +1,7 @@
+services:
+  webphp_pizzeria: # L'etiqueta identificadora d'aquest servei dins de docker-compose.yml
+    image: ipizzeria:1.0 # El nom que veurem quan fem docker images
+    build: .
+    container_name: cpizzeria # El nom que veurem quan fem docker ps -a
+    ports:
+      - "80:80" # Primer el port del host i després el del contenidor
