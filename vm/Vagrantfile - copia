@@ -1,0 +1,55 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# VARIABLES
+
+BOX_IMAGE = "debian/bookworm64"
+PROVIDER = "virtualbox"
+NOM_MAQUINA_VIRTUAL = "pj9f4a87-grup01"
+NUM_CPUS = 2
+MEMORIA_RAM = 2048
+HOSTNAME = "pj9f4a87-grup01.fjeclot.net"
+#    CARPETA_MAQ_FIS = "../apl1"
+#    CARPETA_MAQ_FIS = "../apl2"    
+  # CARPETA_MAQ_VIR = "/home/vagrant/pizzeria"
+ 
+# CONFIGURACIÓ DE LA MÀQUINA
+
+Vagrant.configure("2") do |config|
+	
+	# BOX
+	config.vm.box = BOX_IMAGE
+
+  	# CONFIGURACIÓ ESPECÍFICA DEL PROVIDER
+	config.vm.provider PROVIDER do |provider|
+		provider.name = NOM_MAQUINA_VIRTUAL
+		provider.memory = MEMORIA_RAM
+		provider.cpus = NUM_CPUS
+		provider.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
+	config.vm.synced_folder "../apl1","/home/vagrant/aplicacions/apl1"
+	config.vm.synced_folder "../apl2","/home/vagrant/aplicacions/apl2"
+end
+
+	# CONFIGURACIÓ GENERAL
+	config.vm.hostname = HOSTNAME	
+#	config.vm.synced_folder CARPETA_MAQ_FIS,CARPETA_MAQ_VIR
+	config.vm.network "public_network"	
+#	config.vm.network "forwarded_port", guest: PORT_VIR1, host: PORT_FIS1, protocol: PROT
+#	config.vm.network "forwarded_port", guest: PORT_VIR2, host: PORT_FIS2, protocol: PROT
+ 	# PROGRAMARI A INSTAL·LAR I ORDRES A EXECUTAR DURANT LA CREACIÓ DE LA MÀQUINA
+	config.vm.provision "shell", inline: <<-SHELL
+		#
+		# Actualització de la llista de programari. Instal·lació del programari general
+		sudo apt-get install -y net-tools
+        sudo apt-get install -y whois
+		sudo apt-get install -y aptitude
+		sudo apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+	    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-get add -
+	    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs)  stable"
+	    sudo apt-get update -y
+	    sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose
+	    sudo gpasswd -a vagrant docker
+	SHELL
+  
+end
+
